@@ -15,7 +15,7 @@ MEM_USAGE=$(free -h | grep Mem | awk '{print $3 "/" $2}')
 CPU_LOAD=$(top -bn1 | grep load | awk '{printf "%.2f", $(NF-2)}')
 
 # Define the output file path
-REPORT_FILE="/home/admin/system_report/system_status_report.txt"
+REPORT_FILE="/var/tmp/system_report/system_status_report.txt"
 
 # Display the system report and save it to a file in /root/
 {
