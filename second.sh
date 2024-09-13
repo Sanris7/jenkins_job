@@ -1,25 +1,19 @@
 #!/bin/bash
 
-# Define the directory for the repository
-REPO_DIR="jenkins_job"
-
-# Check if the directory exists
-if [ -d "$REPO_DIR" ]; then
-  echo "Directory $REPO_DIR exists. Pulling the latest changes..."
-  # Change to the repository directory
-  cd $REPO_DIR
-  # Pull the latest changes from the repository
-  git pull origin second
-else
-  echo "Directory $REPO_DIR does not exist. Cloning the repository..."
-  # Clone the repository if the directory does not exist
-  git clone https://github.com/Sanris7/jenkins_job.git $REPO_DIR
-  # Change to the repository directory
-  cd $REPO_DIR
+# Create the directory if it doesn't exist
+DIRECTORY="/var/tmp/jenkins/services_running"
+if [ ! -d "$DIRECTORY" ]; then
+  mkdir -p "$DIRECTORY"
 fi
 
-# Make sure the script is executable
-chmod +x status_report.sh
+# Get the current date and time for the filename
+DATE_TIME=$(date +"%Y-%m-%d_%H-%M-%S")
 
-# Run the script
-./status_report.sh
+# Filename for the report
+FILENAME="$DIRECTORY/services_running_$DATE_TIME.txt"
+
+# List running services and save to the file
+systemctl list-units --type=service --state=running > "$FILENAME"
+
+# Notify the user
+echo "Service report saved to $FILENAME"
