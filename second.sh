@@ -1,20 +1,25 @@
 #!/bin/bash
 
-# Define the directory where the report will be saved
-DIRECTORY="/var/tmp/services"
-if [ ! -d "$DIRECTORY" ]; then
-  mkdir -p "$DIRECTORY"
+# Define the output directory and ensure it exists
+OUTPUT_DIR="/var/tmp/services/"
+mkdir -p "$OUTPUT_DIR"
+
+# Define the output file with date and time
+DATE_TIME=$(date +"%Y%m%d_%H%M%S")
+OUTPUT_FILE="${OUTPUT_DIR}service_report_${DATE_TIME}.txt"
+
+# List all running services and save to the output file
+# For systems using systemd
+if command -v systemctl >/dev/null 2>&1; then
+    echo "Listing all running services using systemd..." > "$OUTPUT_FILE"
+    systemctl list-units --type=service --state=running >> "$OUTPUT_FILE"
+# For systems using init.d
+elif command -v service >/dev/null 2>&1; then
+    echo "Listing all running services using init.d..." > "$OUTPUT_FILE"
+    service --status-all 2>&1 | grep '+' >> "$OUTPUT_FILE"
+else
+    echo "No recognized service management tool found." > "$OUTPUT_FILE"
 fi
 
-# Get the current date and time for the filename
-DATE_TIME=$(date +"%Y-%m-%d_%H-%M-%S")
-
-# Define the filename for the report
-FILENAME="$DIRECTORY/services_running_$DATE_TIME.txt"
-
-# List all running services
-# You can use `ps` or another method if `systemctl` is not preferred
-ps -eo pid,comm,etime --sort=-etime | grep -v '^ *PID' > "$FILENAME"
-
-# Notify the user
-echo "Service report saved to $FILENAME"
+# Notify user of completion
+echo "Service report saved to $OUTPUT_FILE"
