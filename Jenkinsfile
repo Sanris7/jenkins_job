@@ -2,6 +2,13 @@ pipeline {
     agent any
 
     stages {
+        stage('Prepare Workspace') {
+            steps {
+                // Clean the workspace to remove any previous builds
+                deleteDir()
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 // Clone the repository containing third.sh
