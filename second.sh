@@ -1,25 +1,47 @@
 #!/bin/bash
 
-# Define the output directory and ensure it exists
-OUTPUT_DIR="/var/tmp/services/"
-mkdir -p "$OUTPUT_DIR"
+# Simple Status Report Script
 
-# Define the output file with date and time
-DATE_TIME=$(date +"%Y%m%d_%H%M%S")
-OUTPUT_FILE="${OUTPUT_DIR}service_report_${DATE_TIME}.txt"
+# Get the current date and time for the filename
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
-# List all running services and save to the output file
-# For systems using systemd
-if command -v systemctl >/dev/null 2>&1; then
-    echo "Listing all running services using systemd..." > "$OUTPUT_FILE"
-    systemctl list-units --type=service --state=running >> "$OUTPUT_FILE"
-# For systems using init.d
-elif command -v service >/dev/null 2>&1; then
-    echo "Listing all running services using init.d..." > "$OUTPUT_FILE"
-    service --status-all 2>&1 | grep '+' >> "$OUTPUT_FILE"
-else
-    echo "No recognized service management tool found." > "$OUTPUT_FILE"
-fi
+# Define the output file path with timestamp
+REPORT_FILE="/var/client/system_status_report_$TIMESTAMP.txt"
 
-# Notify user of completion
-echo "Service report saved to $OUTPUT_FILE"
+# Create the directory if it doesn't exist
+mkdir -p /var/lib/jenkins/system_report
+
+# Get the system hostname
+HOSTNAME=$(hostname)
+
+# Get the kernel version
+KERNEL_VERSION=$(uname -r)
+
+# Get the system uptime
+UPTIME=$(uptime -p)
+
+# Get the current disk usage
+DISK_USAGE=$(df -h / | grep -v Filesystem | awk '{print $5}')
+
+# Get the current memory usage
+MEM_USAGE=$(free -h | grep Mem | awk '{print $3 "/" $2}')
+
+# Get the CPU load
+CPU_LOAD=$(top -bn1 | grep load | awk '{printf "%.2f", $(NF-2)}')
+
+# Display the system report and save it to the file
+{
+echo "---------------------------------"
+echo "      System Status Report       "
+echo "---------------------------------"
+echo "Hostname    : $HOSTNAME"
+echo "Kernel      : $KERNEL_VERSION"
+echo "Uptime      : $UPTIME"
+echo "Disk Usage  : $DISK_USAGE"
+echo "Memory Usage: $MEM_USAGE"
+echo "CPU Load    : $CPU_LOAD"
+echo "---------------------------------"
+} > $REPORT_FILE
+
+# Optional: Notify that the report has been saved
+echo "Status report saved to $REPORT_FILE"
