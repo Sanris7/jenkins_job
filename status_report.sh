@@ -6,10 +6,16 @@
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
 # Define the output file path with timestamp
-REPORT_FILE="/var/lib/jenkins/system_report/system_status_report_$TIMESTAMP.txt"
+REPORT_FILE="/var/server/system_status_report_$TIMESTAMP.txt"
 
 # Create the directory if it doesn't exist
 mkdir -p /var/lib/jenkins/system_report
+
+# Get the system hostname
+HOSTNAME=$(hostname)
+
+# Get the kernel version
+KERNEL_VERSION=$(uname -r)
 
 # Get the system uptime
 UPTIME=$(uptime -p)
@@ -28,6 +34,8 @@ CPU_LOAD=$(top -bn1 | grep load | awk '{printf "%.2f", $(NF-2)}')
 echo "---------------------------------"
 echo "      System Status Report       "
 echo "---------------------------------"
+echo "Hostname    : $HOSTNAME"
+echo "Kernel      : $KERNEL_VERSION"
 echo "Uptime      : $UPTIME"
 echo "Disk Usage  : $DISK_USAGE"
 echo "Memory Usage: $MEM_USAGE"
