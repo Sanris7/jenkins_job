@@ -9,7 +9,7 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 REPORT_FILE="/var/client/system_status_report_$TIMESTAMP.txt"
 
 # Create the directory if it doesn't exist
-mkdir -p /var/lib/jenkins/system_report
+mkdir -p /var/jenkins/second
 
 # Get the system hostname
 HOSTNAME=$(hostname)
